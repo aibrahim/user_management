@@ -36,7 +36,7 @@
                                (assoc :last_name last_name)
                                (dissoc :confirm)
                                (assoc
-                                :password hashed))]
+                                :pass hashed))]
           (if (seq (find-user-by-email *db* user))
             (-> {:msg "email is already registered!"}
                 (response/conflict))
