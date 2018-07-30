@@ -4,7 +4,8 @@
             [user-management.users :refer :all]
             [compojure.core :refer [defroutes GET POST]]
             [ring.util.http-response :as response]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            [clojure.data.json :as json]))
 
 (defn home-page []
   (layout/render "home.html"))
@@ -15,14 +16,14 @@
   (GET "/docs" []
        (-> (response/ok (-> "docs/docs.md" io/resource slurp))
            (response/header "Content-Type" "text/plain; charset=utf-8")))
-  (POST "/user/login" request 
-                               (try
-                                 (let [headers (:headers request)
-                                       auth (get headers "authorization")]
-                                   (login! request auth))
-                                 (catch Exception e {"msg" "something wrong."})))
-  (POST "/user/logout" [] 
+  (POST "/user/login" request  (json/write-str
+                                (try
+                                  (let [headers (:headers request)
+                                        auth (get headers "authorization")]
+                                    (login! request auth))
+                                  (catch Exception e {"msg" "something wrong."}))))
+  (POST "/user/logout" [] (json/write-str
                            (-> {"msg" "logout successfully."}
                                (response/ok)
-                               (assoc :session nil))))
-
+                               (assoc :session nil)))))
+  

@@ -59,7 +59,7 @@
 (defn authenticate [[email password]]
   (let [user (->> {:email email} find-user-by-email first)]
     (if user
-      (if (hashers/check password (:password user) {:alg :pbkdf2+sha256})
+      (if (hashers/check password (:pass user) {:alg :pbkdf2+sha256})
         email))))
 
 (defn login! [{:keys [session]} auth]
