@@ -15,6 +15,7 @@
     <script type="text/javascript">
         var context = "{{servlet-context}}";
         var csrfToken = "{{csrf-token}}";
+        var user = {{user|json|safe}};
     </script>
     {% script "/js/app.js" %}
   </body>

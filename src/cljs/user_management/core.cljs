@@ -103,6 +103,7 @@
       (ant/message-error msg))))
 
 (defn login-handler [response id]
+  (session/put! :identity id)
   (swap! app-state assoc :login-msg response)
   (handle-login-errors id))
 

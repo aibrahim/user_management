@@ -3,9 +3,10 @@
             [cheshire.generate :as cheshire]
             [cognitect.transit :as transit]
             [clojure.tools.logging :as log]
-            [user-management.layout :refer [error-page *app-context*]]
+            [user-management.layout :refer [error-page *app-context* *identity*]]
             [ring.middleware.anti-forgery :refer [wrap-anti-forgery]]
             [ring.middleware.webjars :refer [wrap-webjars]]
+            [ring.middleware.session.cookie :refer [cookie-store]]
             [muuntaja.core :as muuntaja]
             [muuntaja.format.json :refer [json-format]]
             [muuntaja.format.transit :as transit-format]
@@ -93,6 +94,11 @@
     {:status 403
      :title (str "Access to " (:uri request) " is not authorized")}))
 
+(defn wrap-identity [handler]
+  (fn [request]
+    (binding [*identity* (get-in request [:session :identity])]
+      (handler request))))
+
 (defn wrap-restricted [handler]
   (restrict handler {:handler authenticated?
                      :on-error on-error}))
@@ -108,10 +114,11 @@
       wrap-auth
       wrap-webjars
       wrap-flash
-      (wrap-session {:cookie-attrs {:http-only true}})
+      wrap-identity
       (wrap-defaults
         (-> site-defaults
             (assoc-in [:security :anti-forgery] false)
-            (dissoc :session)))
+            (assoc-in [:session :store] (cookie-store {:key "0b0f3256ec202a30"}))))
+      (wrap-session {:cookie-attrs {:http-only true}})
       wrap-context
       wrap-internal-error))
