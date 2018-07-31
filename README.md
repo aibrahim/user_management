@@ -1,14 +1,17 @@
 # user_management
 
-generated using Luminus version "2.9.12.78"
-
-FIXME
+user management demo
 
 ## Prerequisites
 
-You will need [Leiningen][1] 2.0 or above installed.
+Database setup:
 
-[1]: https://github.com/technomancy/leiningen
+1- psql
+2- CREATE DATABASE <db_name>;
+3- create ROLE <username>;
+4- ALTER USER <username> with password '<password>';
+5- grant all privileges on database <db_name> to <username>;
+6- ALTER ROLE "<username>" WITH LOGIN;
 
 ## Running
 
