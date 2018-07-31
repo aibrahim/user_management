@@ -96,6 +96,7 @@
 
 (defn wrap-identity [handler]
   (fn [request]
+    (println "session:" (:session request))
     (binding [*identity* (get-in request [:session :identity])]
       (handler request))))
 
@@ -106,6 +107,7 @@
 (defn wrap-auth [handler]
   (let [backend (session-backend)]
     (-> handler
+        wrap-identity
         (wrap-authentication backend)
         (wrap-authorization backend))))
 
@@ -114,7 +116,6 @@
       wrap-auth
       wrap-webjars
       wrap-flash
-      wrap-identity
       (wrap-defaults
         (-> site-defaults
             (assoc-in [:security :anti-forgery] false)
