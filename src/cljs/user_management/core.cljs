@@ -50,6 +50,14 @@
         [ant/menu-item [:a {:href "#"}] "Test#1"]
       [ant/menu-item [:a {:href "#"}] "Test#2"]]]))
 
+(defn logout-handler [response]
+  (.log js/console (str response)))
+
+(defn logout! []
+  (POST "/user/logout" 
+        {:handler logout-handler
+         :error-handler (fn [r] (prn r))}))
+
 (defn page-header []
   [ant/layout-header {:style {:padding "0px"}}
    [:div {:class "header"}
@@ -62,7 +70,11 @@
      [:span {:class "action account"}
       [ant/avatar {:style {:background-color "#108ee9"} :shape "circle" :class "avatar ant-avatar-sm" :icon "user"}]
       [:span {:class "name"}
-       "Abdullah Ibrahim"]]]]])
+       (str 
+        (session/get :identity)
+        " | " )
+       [:a {:href "#"
+            :on-click #(logout!)} "logout"]]]]]])
 
 (defn page-footer []
   [ant/layout-footer {:style {:padding "0px"}}
@@ -103,7 +115,7 @@
       (ant/message-error msg))))
 
 (defn login-handler [response id]
-  (session/put! :identity id)
+  (.log js/console (str "response: " response))
   (swap! app-state assoc :login-msg response)
   (handle-login-errors id))
 
@@ -201,4 +213,5 @@
 (defn init! []
   (load-interceptors!)
   (hook-browser-navigation!)
+  (session/put! :identity js/user)
   (mount-components))

@@ -16,14 +16,13 @@
   (GET "/docs" []
        (-> (response/ok (-> "docs/docs.md" io/resource slurp))
            (response/header "Content-Type" "text/plain; charset=utf-8")))
-  (POST "/user/login" request  (json/write-str
-                                (try
-                                  (let [headers (:headers request)
-                                        auth (get headers "authorization")]
-                                    (login! request auth))
-                                  (catch Exception e {"msg" "something wrong."}))))
-  (POST "/user/logout" [] (json/write-str
-                           (-> {"msg" "logout successfully."}
-                               (response/ok)
-                               (assoc :session nil)))))
-  
+  (POST "/user/login" request (try
+                                (let [headers (:headers request)
+                                      auth (get headers "authorization")]
+                                  (login! request auth))
+                                (catch Exception e
+                                  (response/internal-server-error) {"msg" "something wrong."})))
+  (POST "/user/logout" [] (-> {"msg" "logout successfully."}
+                              (response/ok)
+                              (assoc :session nil))))
+

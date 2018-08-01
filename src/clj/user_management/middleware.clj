@@ -113,13 +113,14 @@
 
 (defn wrap-base [handler]
   (-> ((:middleware defaults) handler)
-      wrap-auth
+      wrap-identity
       wrap-webjars
       wrap-flash
       (wrap-defaults
-        (-> site-defaults
-            (assoc-in [:security :anti-forgery] false)
-            (assoc-in [:session :store] (cookie-store {:key "0b0f3256ec202a30"}))))
-      (wrap-session {:cookie-attrs {:http-only true}})
+       (-> site-defaults
+           (assoc-in [:security :anti-forgery] false)
+           (assoc-in [:session :store] (cookie-store {:key "0b0f3256ec202a30"}))
+           ))
+      ;(wrap-session {:cookie-attrs {:http-only true}})
       wrap-context
       wrap-internal-error))
